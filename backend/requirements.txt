@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+pgvector
+pydantic
+pydantic-settings
+psycopg2-binary
+alembic
+langchain
+langchain-openai
+langchain-anthropic
+python-dotenv
+python-multipart
+PyMuPDF
+pytest
+tenacity
