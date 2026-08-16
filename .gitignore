@@ -32,6 +32,8 @@ htmlcov/
 *.sqlite
 *.sqlite3
 test.db
+forgeiq.db
+backend/forgeiq.db
 uploads/*
 !uploads/.gitkeep
 backend/uploads/*

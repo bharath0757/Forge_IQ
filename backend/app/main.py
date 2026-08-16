@@ -1,3 +1,5 @@
+import os
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,13 +9,29 @@ from app.config import settings
 import app.models.product  # noqa: F401 — ensures models are loaded for init_db
 import app.models.document  # noqa: F401 — ensures document tables are created
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # ── Startup ──────────────────────────────────────────────────────
+    logger.info("ForgeIQ API starting up…")
+    logger.info(f"  Database : {settings.database_url}")
+    logger.info(f"  AI Provider: {settings.ai_provider}")
+    logger.info(f"  CORS origins: {settings.cors_origins_list}")
+
+    # Ensure uploads directory exists
+    os.makedirs(settings.uploads_path, exist_ok=True)
+
     init_db()
+    logger.info("Database initialised ✓")
     yield
-    # Shutdown (if needed)
+    # ── Shutdown ─────────────────────────────────────────────────────
+    logger.info("ForgeIQ API shutting down.")
 
 
 app = FastAPI(
@@ -31,7 +49,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+
+@app.get("/", include_in_schema=False)
 def read_root():
     return {
         "service": "ForgeIQ Engine API",
@@ -40,6 +59,7 @@ def read_root():
         "docs_url": "/docs",
         "health_url": "/health",
     }
+
 
 # Mount health routes to both /health and /api/health
 app.include_router(health.router, prefix="/health", tags=["Health"])
