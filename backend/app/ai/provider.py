@@ -1,7 +1,9 @@
 import json
 import logging
+import time
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type, Optional
+from typing import Any, Callable, Dict, List, Type, Optional, Union
+import httpx
 from pydantic import BaseModel, ValidationError
 
 from langchain_core.language_models import BaseChatModel
@@ -33,7 +35,12 @@ class LangchainOpenAIProvider(AIProvider):
     def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0, api_key: Optional[str] = None):
         import os
         from app.config import settings
-        resolved_key = api_key or settings.openai_api_key or os.environ.get("OPENAI_API_KEY") or "mock-key"
+        resolved_key = api_key or settings.openai_api_key or os.environ.get("OPENAI_API_KEY") or ""
+        if not resolved_key:
+            raise ValueError(
+                "OpenAI API key is required when using the OpenAI provider. "
+                "Set OPENAI_API_KEY environment variable or use ai_provider='deterministic'."
+            )
         self.llm = ChatOpenAI(model=model_name, temperature=temperature, api_key=resolved_key)
 
     @retry(
@@ -73,6 +80,147 @@ class LangchainOpenAIProvider(AIProvider):
     def validate_attribute(self, attribute_name: str, attribute_value: Any, evidence: str) -> bool:
         # Placeholder logic for verifying specific attributes
         return True
+
+
+class NVIDIAProvider(AIProvider):
+    """NVIDIA NIM provider with deterministic recovery for offline operation."""
+
+    base_url = "https://integrate.api.nvidia.com/v1"
+
+    def __init__(
+        self,
+        model_name: Optional[str] = None,
+        embed_model_name: Optional[str] = None,
+        timeout: float = 30.0,
+        client: Optional[httpx.Client] = None,
+    ):
+        from app.config import settings
+
+        self.model_name = model_name or settings.nvidia_model
+        self.embed_model_name = embed_model_name or settings.nvidia_embed_model
+        self.api_key = settings.nvidia_api_key
+        self.timeout = timeout
+        self._client = client
+        self._fallback = DeterministicAIProvider()
+
+    def _request(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        if not self.api_key:
+            raise RuntimeError("NVIDIA_API_KEY is not configured")
+
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        client = self._client or httpx.Client(timeout=self.timeout)
+        close_client = self._client is None
+        try:
+            response = client.post(
+                f"{self.base_url}/{endpoint}",
+                headers=headers,
+                json=payload,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return response.json()
+        finally:
+            if close_client:
+                client.close()
+
+    def _safe_request(self, endpoint: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        for attempt in range(3):
+            try:
+                return self._request(endpoint, payload)
+            except (httpx.TimeoutException, httpx.TransportError, httpx.HTTPStatusError) as exc:
+                response = getattr(exc, "response", None)
+                status_code = getattr(response, "status_code", None)
+                transient = isinstance(exc, (httpx.TimeoutException, httpx.TransportError)) or status_code == 408 or status_code == 429 or (status_code is not None and status_code >= 500)
+                if not transient or attempt == 2:
+                    logger.warning("NVIDIA provider request failed (%s): %s", endpoint, type(exc).__name__)
+                    return None
+                time.sleep(0.1 * (2 ** attempt))
+            except (ValueError, RuntimeError) as exc:
+                logger.warning("NVIDIA provider request failed (%s): %s", endpoint, type(exc).__name__)
+                return None
+        return None
+
+    def generate_text(self, prompt: str) -> str:
+        response = self._safe_request(
+            "chat/completions",
+            {
+                "model": self.model_name,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+            },
+        )
+        if not response:
+            return ""
+        try:
+            return str(response["choices"][0]["message"]["content"])
+        except (KeyError, IndexError, TypeError) as exc:
+            logger.warning("NVIDIA provider returned an invalid text response: %s", type(exc).__name__)
+            return ""
+
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[BaseModel],
+        fallback: Optional[Callable[[], BaseModel]] = None,
+    ) -> BaseModel:
+        response = self._safe_request(
+            "chat/completions",
+            {
+                "model": self.model_name,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+                "response_format": {"type": "json_object"},
+            },
+        )
+        if response:
+            try:
+                content = response["choices"][0]["message"]["content"]
+                parsed = json.loads(content) if isinstance(content, str) else content
+                return schema.model_validate(parsed)
+            except (KeyError, IndexError, TypeError, json.JSONDecodeError, ValidationError) as exc:
+                logger.warning("NVIDIA provider returned invalid structured output: %s", type(exc).__name__)
+
+        if fallback:
+            return fallback()
+        return schema.model_construct()
+
+    def embed(self, text: Union[str, List[str]]) -> Union[List[float], List[List[float]]]:
+        inputs = [text] if isinstance(text, str) else text
+        response = self._safe_request(
+            "embeddings",
+            {"model": self.embed_model_name, "input": inputs, "input_type": "passage"},
+        )
+        if response:
+            try:
+                vectors = [item["embedding"] for item in sorted(response["data"], key=lambda item: item["index"])]
+                return vectors[0] if isinstance(text, str) else vectors
+            except (KeyError, TypeError, IndexError) as exc:
+                logger.warning("NVIDIA provider returned invalid embedding output: %s", type(exc).__name__)
+
+        fallback_vectors = self._fallback_embedding(text)
+        return fallback_vectors
+
+    def _fallback_embedding(self, text: Union[str, List[str]]) -> Union[List[float], List[List[float]]]:
+        from app.retrieval.embeddings import DeterministicEmbeddingProvider
+
+        fallback = DeterministicEmbeddingProvider()
+        if isinstance(text, str):
+            return fallback.embed_query(text)
+        return fallback.embed_documents(text)
+
+    def extract_product_attributes(self, product_info: str, evidence: str, schema: Type[BaseModel]) -> BaseModel:
+        prompt = EXTRACTION_PROMPT.format(product_info=product_info, evidence_text=evidence).to_string()
+        return self.generate_structured(
+            prompt,
+            schema,
+            fallback=lambda: self._fallback.extract_product_attributes(product_info, evidence, schema),
+        )
+
+    def classify_product(self, product_info: str) -> str:
+        return self._fallback.classify_product(product_info)
+
+    def validate_attribute(self, attribute_name: str, attribute_value: Any, evidence: str) -> bool:
+        return self._fallback.validate_attribute(attribute_name, attribute_value, evidence)
 
 
 class DeterministicAIProvider(AIProvider):
@@ -124,3 +272,12 @@ class DeterministicAIProvider(AIProvider):
 
     def validate_attribute(self, attribute_name: str, attribute_value: Any, evidence: str) -> bool:
         return bool(str(attribute_value).lower() in evidence.lower())
+
+def get_ai_provider() -> AIProvider:
+    """Factory to get the configured AI provider."""
+    from app.config import settings
+    if settings.ai_provider == "deterministic":
+        return DeterministicAIProvider()
+    if settings.ai_provider == "nvidia":
+        return NVIDIAProvider()
+    return LangchainOpenAIProvider()

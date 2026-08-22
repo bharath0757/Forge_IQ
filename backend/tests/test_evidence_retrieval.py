@@ -290,8 +290,10 @@ def test_api_extract_and_evidence_endpoints(db_session, sample_retriever):
     assert ev_data["evidence"][0]["document_name"] == "Siemens_Datasheet.pdf"
 
     # 4. Test POST /api/products/{id}/extract with mocked LLM
-    with patch("app.ai.provider.LangchainOpenAIProvider.extract_product_attributes") as mock_extract:
-        mock_extract.return_value = MotorProtectionCircuitBreakerAttributes(
+    with patch("app.ai.extractor.get_ai_provider") as mock_get_provider:
+        mock_provider_instance = MagicMock()
+        mock_get_provider.return_value = mock_provider_instance
+        mock_provider_instance.extract_product_attributes.return_value = MotorProtectionCircuitBreakerAttributes(
             voltage=ExtractedAttribute(value="400 V", status="EXTRACTED", evidence_ids=["chunk_api_v"]),
             current=ExtractedAttribute(value="0.4 A", status="EXTRACTED", evidence_ids=["chunk_api_v"]),
             frequency=ExtractedAttribute(value=None, status="UNKNOWN", evidence_ids=[]),

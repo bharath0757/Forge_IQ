@@ -32,11 +32,38 @@ class ProductTwin(Base):
     id = Column(String, primary_key=True, index=True)
     part_number = Column(String, index=True)
     brand = Column(String, index=True)
+    manufacturer = Column(String, nullable=True)
+    source_brand = Column(String, nullable=True)
+    candidate_brand = Column(String, nullable=True)
+    manufacturer_status = Column(String, nullable=True)
+    brand_status = Column(String, nullable=True)
+    manufacturer_match_type = Column(String, nullable=True)
+    brand_match_type = Column(String, nullable=True)
     description = Column(String)
     category = Column(String, index=True)
     overall_quality_score = Column(Float)
     status = Column(String, index=True)
     evidence_count = Column(Integer, default=0)
+
+    # Taxonomy fields
+    taxonomy_dept = Column(String, nullable=True)
+    taxonomy_class = Column(String, nullable=True)
+    taxonomy_fine = Column(String, nullable=True)
+    taxonomy_classpath = Column(String, nullable=True)
+    taxonomy_confidence = Column(Float, nullable=True)
+    taxonomy_status = Column(String, nullable=True)
+
+    # Generated descriptions
+    desc_short = Column(String, nullable=True)
+    desc_long = Column(String, nullable=True)
+    desc_invoice = Column(String, nullable=True)
+    desc_mobile = Column(String, nullable=True)
+    desc_retail = Column(String, nullable=True)
+    desc_marketing = Column(String, nullable=True)
+
+    # Delivery state
+    delivery_state = Column(String, default="PENDING")  # PENDING, MAPPED, EXPORTED
+
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     

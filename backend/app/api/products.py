@@ -58,10 +58,14 @@ def ingest_product(
     product_id = f"prod_{uuid.uuid4().hex[:12]}"
     now = datetime.now(timezone.utc)
 
+    from app.normalization.entity_resolution import get_entity_resolution_service
+    resolver = get_entity_resolution_service()
+    clean_brand = resolver.clean_brand(brand) or ""
+    
     product_data = {
         "id": product_id,
         "part_number": part_number.strip(),
-        "brand": brand.strip(),
+        "brand": clean_brand,
         "description": description.strip(),
         "category": category.strip() or "General",
         "overall_quality_score": 0.0,
@@ -286,6 +290,21 @@ def extract_attributes_endpoint(
         top_k=top_k,
     )
 
+    # Add taxonomy attributes
+    from app.taxonomy.engine import get_taxonomy_engine
+    tax_engine = get_taxonomy_engine()
+    tax_res = tax_engine.classify_product(product.category, product.description, product.brand)
+    from app.schemas.product import ProductAttribute, AttributeStatus
+    for tax_key, tax_val in tax_res.dict().items():
+        result["attributes"].append(ProductAttribute(
+            name=tax_key.capitalize(),
+            value=tax_val,
+            unit="",
+            confidence=0.9,
+            status=AttributeStatus.VERIFIED,
+            evidence_ids=[]
+        ))
+
     # Persist in DB
     db_attrs = save_extracted_attributes_and_evidence(
         db=db,
@@ -342,11 +361,23 @@ def normalize_product_attributes_endpoint(
     from app.normalization.service import get_normalization_service
     normalizer = get_normalization_service()
 
+    from app.normalization.fraction_normalizer import FractionNormalizer
+    from app.normalization.uom_normalizer import UOMNormalizer
+
     normalized_count = 0
     for attr in product.attributes:
         if attr.value is not None:
+            # First, standard normalization
             norm_res = normalizer.normalize_attribute(attr.name, attr.value)
-            attr.normalized_value = norm_res.normalized_value
+            
+            # Refine value with Fraction Normalizer
+            refined_val = norm_res.normalized_value or attr.value
+            if isinstance(refined_val, str):
+                refined_val = FractionNormalizer.normalize_string(refined_val)
+                # Refine with UOM Normalizer
+                refined_val = UOMNormalizer.normalize_value_and_unit(refined_val)
+                
+            attr.normalized_value = refined_val
             attr.unit = norm_res.unit
             if norm_res.requires_review:
                 attr.status = "REQUIRES_REVIEW"
@@ -797,16 +828,30 @@ def seed_demo_catalog_endpoint(db: Session = Depends(get_db)):
 
 
 @router.post("/demo")
-def launch_demo_mode_endpoint(db: Session = Depends(get_db)):
+def launch_demo_mode_endpoint(
+    product_id: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
     """
     Launch ForgeIQ Demo Mode:
-    Executes the full 8-stage pipeline for Siemens 3RV2011-1JA10 Motor Protection Circuit Breaker
-    with multi-source evidence (Datasheet, Catalog, Distributor spec) and intentional discrepancy.
+    Executes the full 8-stage pipeline. If product_id is provided, runs on that product.
+    Otherwise, runs on the default Siemens demo product.
     """
     from app.services.pipeline_runner import get_pipeline_runner
     runner = get_pipeline_runner()
 
-    demo_product_id = "prod_siemens_3rv2011_demo"
+    demo_product_id = product_id or "prod_demo_siemens_3rv2011"
+    product = get_product(db, demo_product_id)
+    
+    if not product and not product_id:
+        # Fallback to creating the default demo product if missing
+        from app.services.demo_seeder import seed_demo_products
+        seed_demo_products(db)
+        product = get_product(db, demo_product_id)
+        
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     job = runner.create_job(db, demo_product_id)
 
     # Run the real 8-stage pipeline
@@ -814,10 +859,10 @@ def launch_demo_mode_endpoint(db: Session = Depends(get_db)):
         db=db,
         job_id=job.id,
         product_id=demo_product_id,
-        part_number="3RV2011-1JA10",
-        brand="Siemens",
-        description="SIRIUS Motor Starter Protector / Circuit Breaker, 400 V AC, 10 A, 3 Poles, DIN Rail Mount",
-        category="Motor Protection Circuit Breakers",
+        part_number=product.part_number,
+        brand=product.brand,
+        description=product.description,
+        category=product.category,
     )
 
     return {
@@ -844,29 +889,11 @@ def get_product_job_status_endpoint(
     if not job:
         return {
             "product_id": product_id,
-            "status": "COMPLETED",
-            "stage": "08 PUBLISH",
-            "progress": 100,
-            "stages": {
-                "01 IDENTIFY": {"status": "COMPLETED", "message": "✓ Product identified"},
-                "02 DISCOVER": {"status": "COMPLETED", "message": "✓ Technical documentation indexed"},
-                "03 EXTRACT": {"status": "COMPLETED", "message": "✓ Attributes extracted"},
-                "04 NORMALIZE": {"status": "COMPLETED", "message": "✓ Canonical units normalized"},
-                "05 VALIDATE": {"status": "COMPLETED", "message": "✓ Validation rules executed"},
-                "06 DECIDE": {"status": "COMPLETED", "message": "✓ Confidence scores computed"},
-                "07 REVIEW": {"status": "COMPLETED", "message": "✓ Review eligibility evaluated"},
-                "08 PUBLISH": {"status": "COMPLETED", "message": "✓ Product Twin generated"},
-            },
-            "messages": [
-                "✓ Product identified",
-                "✓ Technical documentation indexed",
-                "✓ Attributes extracted",
-                "✓ Canonical units normalized",
-                "✓ Validation rules executed",
-                "✓ Confidence scores computed",
-                "✓ Review eligibility evaluated",
-                "✓ Product Twin generated",
-            ],
+            "status": "NO_JOB",
+            "stage": None,
+            "progress": 0,
+            "stages": {},
+            "messages": ["No processing job found for this product."],
         }
 
     return {

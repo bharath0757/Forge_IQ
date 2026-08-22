@@ -1,0 +1,460 @@
+{
+  "evaluation": {
+    "processed": 1000,
+    "failed": 0,
+    "manufacturer_resolution": "959/1000",
+    "brand_resolution": "796/1000",
+    "identity_resolution": "771/1000",
+    "taxonomy_resolution": "750/1000",
+    "attributes_per_product": 3.54,
+    "evidence_per_product": 3.96,
+    "confidence_average": 63.47,
+    "description_generation": "1000/1000",
+    "description_valid_rate": "999/1000",
+    "review_required_rate": "996/1000",
+    "unresolved_rate": "0/1000",
+    "evidence_input_derived": 3964,
+    "evidence_local_doc": 0,
+    "evidence_manufacturer": 0,
+    "product_type_detected": "606/1000",
+    "manufacturer_failures": {
+      "missing manufacturer": 41
+    },
+    "taxonomy_breakdown": {
+      "heuristic": 541,
+      "correct_confident": 209,
+      "unresolved": 250
+    },
+    "category_stats": {
+      "abrasives": {
+        "rows": 50,
+        "manufacturer_resolution": "50/50",
+        "brand_resolution": "50/50",
+        "taxonomy_resolution": "50/50",
+        "attributes_per_product": 6.76,
+        "description_valid_rate": "50/50"
+      },
+      "other": {
+        "rows": 500,
+        "manufacturer_resolution": "465/500",
+        "brand_resolution": "335/500",
+        "taxonomy_resolution": "293/500",
+        "attributes_per_product": 2.68,
+        "description_valid_rate": "499/500"
+      },
+      "appliances": {
+        "rows": 48,
+        "manufacturer_resolution": "48/48",
+        "brand_resolution": "33/48",
+        "taxonomy_resolution": "48/48",
+        "attributes_per_product": 3.38,
+        "description_valid_rate": "48/48"
+      },
+      "decking_building": {
+        "rows": 181,
+        "manufacturer_resolution": "177/181",
+        "brand_resolution": "181/181",
+        "taxonomy_resolution": "180/181",
+        "attributes_per_product": 4.83,
+        "description_valid_rate": "181/181"
+      },
+      "electrical": {
+        "rows": 39,
+        "manufacturer_resolution": "38/39",
+        "brand_resolution": "30/39",
+        "taxonomy_resolution": "37/39",
+        "attributes_per_product": 3.64,
+        "description_valid_rate": "39/39"
+      },
+      "lighting": {
+        "rows": 182,
+        "manufacturer_resolution": "181/182",
+        "brand_resolution": "167/182",
+        "taxonomy_resolution": "142/182",
+        "attributes_per_product": 3.79,
+        "description_valid_rate": "182/182"
+      }
+    },
+    "description_samples": [
+      {
+        "mpn": "DCB518ASTS06G",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DCB518ASTS06G - Sanding Belt - 50.8 x 457.2 mm - 6pc",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "quantity",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100075678",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100075678 - Stikit Film Disc - P150 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100045865",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100045865 - Stikit Film Disc - P120 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100048736",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100048736 - Stikit Film Disc - P80 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100075690",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100075690 - Stikit Film Disc - P180 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100075692",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100075692 - Stikit Film Disc - P220 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "3MABR-7100145365",
+        "brand": "Cubitron",
+        "manufacturer": "Jam Industrial Supply",
+        "short_desc": "Cubitron - 3MABR-7100145365 - Stikit Film Disc - P320 - 50 Disc/Box",
+        "issues": [],
+        "attributes": [
+          "quantity",
+          "grit",
+          "product_type",
+          "brand"
+        ]
+      },
+      {
+        "mpn": "5B-332-080",
+        "brand": "Hiolit",
+        "manufacturer": "Mirka",
+        "short_desc": "Hiolit - 5B-332-080 - Hiolit Abrasive Disc - P80",
+        "issues": [],
+        "attributes": [
+          "grit",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "5B-332-120",
+        "brand": "Hiolit",
+        "manufacturer": "Mirka",
+        "short_desc": "Hiolit - 5B-332-120 - Hiolit Abrasive Disc - P120",
+        "issues": [],
+        "attributes": [
+          "grit",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "9A-570-240",
+        "brand": "Abranet",
+        "manufacturer": "Mirka",
+        "short_desc": "Abranet - 9A-570-240 - Abranet Abrasive Sheet - 2.8 x 30 mm - 9 A",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "height",
+          "current",
+          "amperage",
+          "rating",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "9A-570-320",
+        "brand": "Abranet",
+        "manufacturer": "Mirka",
+        "short_desc": "Abranet - 9A-570-320 - Abranet Abrasive Sheet - 2.8 x 30 mm - 9 A",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "height",
+          "current",
+          "amperage",
+          "rating",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "DBD090094101F",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DBD090094101F - Cut-Off Disc",
+        "issues": [],
+        "attributes": [
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "DBDS12125A01F",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DBDS12125A01F - Cut-Off Disc - Steel",
+        "issues": [],
+        "attributes": [
+          "material",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "DBDS12125G01F",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DBDS12125G01F - Cut-Off Disc - 304.8 x 508 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "DBDS14125A01F",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DBDS14125A01F - Cut-Off Disc - 355.6 x 25.4 mm - Steel",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "material",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "DBDS14125G01F",
+        "brand": "Diablo",
+        "manufacturer": "Freud",
+        "short_desc": "Diablo - DBDS14125G01F - Cut-Off Disc - 355.6 x 508 mm - Steel",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "material",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0013",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0013 - Cut-Off Disc - 1143 x 177.8 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "diameter",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0029",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0029 - Cut-Off Disc - 152.4 x 50.8 x 25.4 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "connection",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0033",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0033 - Cut-Off Disc - 177.8 x 25.4 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0001",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0001 - Cut-Off Disc - 1016 x 127 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "diameter",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0039",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0039 - Cut-Off Disc - 177.8 x 25.4 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "connection",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0043",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0043 - Cut-Off Disc - 228.6 x 76.2 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0048",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0048 - Cut-Off Disc - 304.8 x 177.8 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0053",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0053 - Cut-Off Disc - 304.8 x 25.4 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      },
+      {
+        "mpn": "49-94-0058",
+        "brand": "Milwaukee",
+        "manufacturer": "Milwaukee",
+        "short_desc": "Milwaukee - 49-94-0058 - Cut-Off Disc - 304.8 x 25.4 mm",
+        "issues": [],
+        "attributes": [
+          "width",
+          "length",
+          "dimensions",
+          "application",
+          "product_type",
+          "brand",
+          "model"
+        ]
+      }
+    ],
+    "label": "evaluation"
+  }
+}

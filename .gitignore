@@ -31,6 +31,9 @@ htmlcov/
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+*.db-journal
 test.db
 forgeiq.db
 backend/forgeiq.db
@@ -38,6 +41,7 @@ uploads/*
 !uploads/.gitkeep
 backend/uploads/*
 !backend/uploads/.gitkeep
+data/evaluated_delivery.csv
 
 # Environment files and Secrets
 .env
@@ -47,6 +51,7 @@ backend/uploads/*
 .env.production.local
 backend/.env
 frontend/.env.local
+.env*
 
 # Operating System & IDEs
 .agents/
@@ -60,3 +65,5 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.vercel
+

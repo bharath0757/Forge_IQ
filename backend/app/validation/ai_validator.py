@@ -1,7 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional
 from app.validation.models import ValidationResultItem, ValidationStatus, ValidationSeverity
-from app.ai.provider import AIProvider, LangchainOpenAIProvider
+from app.ai.provider import AIProvider, get_ai_provider
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class AIAssistedValidator:
     """
 
     def __init__(self, ai_provider: Optional[AIProvider] = None):
-        self.ai_provider = ai_provider or LangchainOpenAIProvider()
+        self.ai_provider = ai_provider or get_ai_provider()
 
     def validate_semantic_attributes(
         self,

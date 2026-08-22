@@ -37,6 +37,20 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         return self.client.embed_documents(texts)
 
 
+class NVIDIAEmbeddingProvider(EmbeddingProvider):
+    """Embedding adapter backed by the shared NVIDIA AI provider."""
+
+    def __init__(self):
+        from app.ai.provider import NVIDIAProvider
+        self.provider = NVIDIAProvider()
+
+    def embed_query(self, text: str) -> List[float]:
+        return self.provider.embed(text)  # type: ignore[return-value]
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return self.provider.embed(texts)  # type: ignore[return-value]
+
+
 class DeterministicEmbeddingProvider(EmbeddingProvider):
     """
     Fast, deterministic embedding provider for local development, offline runs, and unit tests.

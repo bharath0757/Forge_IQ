@@ -11,10 +11,13 @@ class Settings(BaseSettings):
     # e.g. "https://your-app.vercel.app,https://your-app.netlify.app"
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,*"
 
-    # AI Providers: "deterministic" (offline), "openai", "anthropic"
+    # AI Providers: "deterministic" (offline), "openai", "anthropic", "nvidia"
     ai_provider: str = "deterministic"
     openai_api_key: str = ""
     anthropic_api_key: str = ""
+    nvidia_api_key: str = ""
+    nvidia_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
+    nvidia_embed_model: str = "nvidia/nemotron-3-embed-1b"
 
     # File Storage
     storage_dir: str = "uploads"

@@ -4,7 +4,12 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 
 from app.retrieval.models import RetrievedEvidence
-from app.retrieval.embeddings import EmbeddingProvider, DeterministicEmbeddingProvider, OpenAIEmbeddingProvider
+from app.retrieval.embeddings import (
+    EmbeddingProvider,
+    DeterministicEmbeddingProvider,
+    NVIDIAEmbeddingProvider,
+    OpenAIEmbeddingProvider,
+)
 from app.retrieval.vector_store import VectorStore, LocalVectorStore
 from app.config import settings
 
@@ -64,6 +69,8 @@ class EvidenceRetriever(BaseEvidenceRetriever):
         
         if embedding_provider is not None:
             self.embedding_provider = embedding_provider
+        elif settings.ai_provider == "nvidia":
+            self.embedding_provider = NVIDIAEmbeddingProvider()
         elif settings.openai_api_key:
             self.embedding_provider = OpenAIEmbeddingProvider(api_key=settings.openai_api_key)
         else:

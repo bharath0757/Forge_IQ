@@ -15,3 +15,12 @@ class NormalizedAttributeResult(BaseModel):
     requires_review: bool = Field(default=False, description="True if manual reviewer inspection is recommended")
     message: Optional[str] = Field(default=None, description="Explanation or normalization notes")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Detailed parsed components")
+    
+    # Pipeline integration fields
+    label: Optional[str] = Field(default=None, description="The canonical label/name of the attribute")
+    confidence: float = Field(default=0.0, description="Confidence score of the attribute")
+    validation_status: Optional[str] = Field(default=None, description="Status from validation engine")
+    conflict_status: Optional[str] = Field(default=None, description="Status from conflict detector")
+    review_status: Optional[str] = Field(default=None, description="Human review status")
+    source_ids: list[str] = Field(default_factory=list, description="IDs of sources supporting this attribute")
+    evidence_ids: list[str] = Field(default_factory=list, description="IDs of evidence chunks supporting this attribute")

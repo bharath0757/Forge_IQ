@@ -49,7 +49,7 @@ def test_demo_mode_full_pipeline_execution(db_session):
     data = resp.json()
 
     assert data["status"] == "SUCCESS"
-    assert "prod_siemens_3rv2011_demo" in data["product_id"]
+    assert "prod_demo_siemens_3rv2011" in data["product_id"]
     assert data["job_id"] is not None
 
     # Check product created

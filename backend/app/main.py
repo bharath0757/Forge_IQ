@@ -3,7 +3,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import health, products, documents
+from app.api import health, products, documents, delivery, batch
 from app.database import init_db
 from app.config import settings
 import app.models.product  # noqa: F401 — ensures models are loaded for init_db
@@ -61,6 +61,18 @@ def read_root():
     }
 
 
+@app.get("/api", include_in_schema=False)
+@app.get("/api/", include_in_schema=False)
+def read_api_root():
+    return {
+        "service": "ForgeIQ Engine API",
+        "version": "0.1.0",
+        "status": "online",
+        "docs_url": "/docs",
+        "health_url": "/api/health",
+    }
+
+
 # Mount health routes to both /health and /api/health
 app.include_router(health.router, prefix="/health", tags=["Health"])
 app.include_router(health.router, prefix="/api/health", tags=["Health"], include_in_schema=False)
@@ -68,3 +80,5 @@ app.include_router(health.router, prefix="/api/health", tags=["Health"], include
 # Core API routes
 app.include_router(products.router, prefix="/api/products", tags=["Products"])
 app.include_router(documents.router, prefix="/api/documents", tags=["Documents"])
+app.include_router(delivery.router, prefix="/api/delivery", tags=["Delivery"])
+app.include_router(batch.router, prefix="/api/batch", tags=["Batch"])

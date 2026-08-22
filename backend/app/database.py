@@ -39,9 +39,39 @@ def init_db():
     # Safe schema migration for SQLite — add columns if they don't exist yet
     if settings.is_sqlite:
         with engine.connect() as conn:
+            # Migration for processing_jobs
             for col, col_type in [("stage", "VARCHAR"), ("stages", "JSON"), ("messages", "JSON")]:
                 try:
                     conn.execute(text(f"ALTER TABLE processing_jobs ADD COLUMN {col} {col_type}"))
+                    conn.commit()
+                except Exception:
+                    pass
+            # Migration for products
+            product_cols = [
+                ("manufacturer", "VARCHAR"),
+                ("source_brand", "VARCHAR"),
+                ("candidate_brand", "VARCHAR"),
+                ("manufacturer_status", "VARCHAR"),
+                ("brand_status", "VARCHAR"),
+                ("manufacturer_match_type", "VARCHAR"),
+                ("brand_match_type", "VARCHAR"),
+                ("taxonomy_dept", "VARCHAR"),
+                ("taxonomy_class", "VARCHAR"),
+                ("taxonomy_fine", "VARCHAR"),
+                ("taxonomy_classpath", "VARCHAR"),
+                ("taxonomy_confidence", "FLOAT"),
+                ("taxonomy_status", "VARCHAR"),
+                ("desc_short", "VARCHAR"),
+                ("desc_long", "VARCHAR"),
+                ("desc_invoice", "VARCHAR"),
+                ("desc_mobile", "VARCHAR"),
+                ("desc_retail", "VARCHAR"),
+                ("desc_marketing", "VARCHAR"),
+                ("delivery_state", "VARCHAR DEFAULT 'PENDING'"),
+            ]
+            for col, col_type in product_cols:
+                try:
+                    conn.execute(text(f"ALTER TABLE products ADD COLUMN {col} {col_type}"))
                     conn.commit()
                 except Exception:
                     pass

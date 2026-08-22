@@ -14,7 +14,7 @@ DEMO_PRODUCTS_DATA: List[Dict[str, Any]] = [
         "part_number": "3RV2011-1JA10",
         "brand": "Siemens",
         "category": "Motor Protection Circuit Breakers",
-        "description": "SIRIUS 3RV20 motor starter protector, class 10, 400 V AC, 10 A, screw terminal, DIN rail mount",
+        "description": "SIRIUS Motor Starter Protector / Circuit Breaker, 400 V AC, 10 A, 7.5 kW, 50/60 Hz, 3 Poles, 97 x 45 x 97 mm, 0.45 kg, DIN Rail Mount",
         "overall_quality_score": 87.5,
         "status": "REQUIRES_REVIEW",
         "evidence_count": 3,
@@ -142,15 +142,39 @@ def seed_demo_products(db: Session) -> List[ProductTwin]:
         db.query(ProductTwin).filter(ProductTwin.id == p_id).delete()
         db.commit()
 
+        # Realistic taxonomy mapping for demo products
+        tax_map = {
+            "Motor Protection Circuit Breakers": ("Electrical", "Motor Control", "Motor Protection"),
+            "Manual Motor Starters": ("Electrical", "Motor Control", "Manual Motor Starters"),
+            "TeSys D Contactors": ("Electrical", "Motor Control", "Contactors"),
+            "Miniature Circuit Breakers": ("Electrical", "Power Distribution", "Miniature Circuit Breakers"),
+            "Industrial Power Supplies": ("Electrical", "Power Supplies", "Industrial Power Supplies"),
+        }
+        dept, cls_n, fine = tax_map.get(item["category"], ("Electrical", "Industrial", item["category"]))
+        classpath = f"{dept} > {cls_n} > {fine}"
+
         product = ProductTwin(
             id=p_id,
             part_number=item["part_number"],
             brand=item["brand"],
+            manufacturer=item["brand"],
             description=item["description"],
-            category=item["category"],
+            category=classpath,
             overall_quality_score=item["overall_quality_score"],
             status=item["status"],
             evidence_count=item["evidence_count"],
+            taxonomy_dept=dept,
+            taxonomy_class=cls_n,
+            taxonomy_fine=fine,
+            taxonomy_classpath=classpath,
+            taxonomy_confidence=1.0,
+            taxonomy_status="RESOLVED",
+            desc_short=item["description"][:120],
+            desc_long=item["description"],
+            desc_retail=item["description"],
+            desc_marketing=item["description"],
+            desc_invoice=item["part_number"],
+            desc_mobile=item["description"][:80],
             created_at=datetime.utcnow() - timedelta(days=2),
             updated_at=datetime.utcnow() - timedelta(hours=1),
         )

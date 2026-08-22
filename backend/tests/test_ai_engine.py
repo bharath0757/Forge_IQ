@@ -1,6 +1,13 @@
 import pytest
+import os
 from unittest.mock import MagicMock, patch
 from pydantic import ValidationError
+
+# Requires OPENAI_API_KEY for tests
+pytestmark = pytest.mark.skipif(
+    not os.getenv("OPENAI_API_KEY"),
+    reason="OpenAI API key required to run AI Engine tests"
+)
 
 from app.ai.provider import LangchainOpenAIProvider
 from app.ai.schemas import MotorProtectionCircuitBreakerAttributes, ExtractedAttribute

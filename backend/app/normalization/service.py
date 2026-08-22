@@ -12,6 +12,21 @@ class NormalizationService:
     Preserves original raw values and flags ambiguous inputs without guessing.
     """
 
+    def __init__(self):
+        self.alias_map = {
+            "milw": "Milwaukee",
+            "milw.": "Milwaukee",
+            "wh": "White",
+            "bk": "Black",
+            "blk": "Black",
+            "lt": "Light",
+            "elect": "Electric",
+            "dg": "Dark Gray",
+            "sst": "Stainless Steel",
+            "bss": "Black Stainless Steel",
+            "in.": "in"
+        }
+
     def normalize_attribute(self, attribute_name: str, raw_value: Any) -> NormalizedAttributeResult:
         """Dispatch attribute to its specialized normalizer based on name."""
         if raw_value is None:
@@ -69,8 +84,8 @@ class NormalizationService:
         elif re.search(r'vdc|v\s*dc|\bdc\b|\bd\.c\.', s, re.IGNORECASE):
             current_type = "DC"
 
-        # Match voltage range (e.g. "110 - 230 V", "400/690 V", "400 to 690 V")
-        range_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:-|/|to)\s*(\d+(?:\.\d+)?)\s*(?:v|volts|vac|vdc)?', s, re.IGNORECASE)
+        # Match voltage range (e.g. "110 - 230 V", "400/690 V", "400 to 690 V", "12 - 24 V DC")
+        range_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:-|/|to)\s*(\d+(?:\.\d+)?)\s*(?:v|volts|vac|vdc)?(?:\s*(?:ac|dc))?', s, re.IGNORECASE)
         if range_match:
             low, high = range_match.group(1), range_match.group(2)
             suffix = f" {current_type}" if current_type else ""
@@ -392,9 +407,25 @@ class NormalizationService:
     # -------------------------------------------------------------------------
     # Generic Normalizer
     # -------------------------------------------------------------------------
+    def resolve_aliases(self, raw: str) -> str:
+        tokens = raw.split()
+        resolved = []
+        for t in tokens:
+            t_lower = t.lower()
+            if t_lower in self.alias_map:
+                resolved.append(self.alias_map[t_lower])
+            else:
+                resolved.append(t)
+        
+        res = " ".join(resolved)
+        # Handle inch quote notation like 1/2" -> 1/2 in
+        res = re.sub(r'(\d(?:/\d+|\.\d+)?)\"', r'\1 in', res)
+        return res
+
     def normalize_generic(self, raw_value: Any) -> NormalizedAttributeResult:
         if isinstance(raw_value, str):
             clean = raw_value.strip()
+            clean = self.resolve_aliases(clean)
             return NormalizedAttributeResult(raw_value=raw_value, normalized_value=clean)
         return NormalizedAttributeResult(raw_value=raw_value, normalized_value=raw_value)
 
