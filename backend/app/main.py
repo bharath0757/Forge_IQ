@@ -77,8 +77,15 @@ def read_api_root():
 app.include_router(health.router, prefix="/health", tags=["Health"])
 app.include_router(health.router, prefix="/api/health", tags=["Health"], include_in_schema=False)
 
-# Core API routes
+# Core API routes (mounted with and without /api prefix for serverless routing resilience)
 app.include_router(products.router, prefix="/api/products", tags=["Products"])
+app.include_router(products.router, prefix="/products", tags=["Products"], include_in_schema=False)
+
 app.include_router(documents.router, prefix="/api/documents", tags=["Documents"])
+app.include_router(documents.router, prefix="/documents", tags=["Documents"], include_in_schema=False)
+
 app.include_router(delivery.router, prefix="/api/delivery", tags=["Delivery"])
+app.include_router(delivery.router, prefix="/delivery", tags=["Delivery"], include_in_schema=False)
+
 app.include_router(batch.router, prefix="/api/batch", tags=["Batch"])
+app.include_router(batch.router, prefix="/batch", tags=["Batch"], include_in_schema=False)

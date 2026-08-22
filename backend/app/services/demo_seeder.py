@@ -135,12 +135,18 @@ def seed_demo_products(db: Session) -> List[ProductTwin]:
     retriever = get_evidence_retriever()
     created_products: List[ProductTwin] = []
 
+    # Clean existing demo records and cascade child tables cleanly
+    demo_ids = [item["id"] for item in DEMO_PRODUCTS_DATA]
+    try:
+        existing = db.query(ProductTwin).filter(ProductTwin.id.in_(demo_ids)).all()
+        for p in existing:
+            db.delete(p)
+        db.commit()
+    except Exception:
+        db.rollback()
+
     for item in DEMO_PRODUCTS_DATA:
         p_id = item["id"]
-
-        # Clean existing demo record if present
-        db.query(ProductTwin).filter(ProductTwin.id == p_id).delete()
-        db.commit()
 
         # Realistic taxonomy mapping for demo products
         tax_map = {

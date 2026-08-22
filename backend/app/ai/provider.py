@@ -6,8 +6,6 @@ from typing import Any, Callable, Dict, List, Type, Optional, Union
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from langchain_core.language_models import BaseChatModel
-from langchain_openai import ChatOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from app.ai.prompts import EXTRACTION_PROMPT
@@ -41,7 +39,11 @@ class LangchainOpenAIProvider(AIProvider):
                 "OpenAI API key is required when using the OpenAI provider. "
                 "Set OPENAI_API_KEY environment variable or use ai_provider='deterministic'."
             )
-        self.llm = ChatOpenAI(model=model_name, temperature=temperature, api_key=resolved_key)
+        try:
+            from langchain_openai import ChatOpenAI
+            self.llm = ChatOpenAI(model=model_name, temperature=temperature, api_key=resolved_key)
+        except ImportError:
+            raise RuntimeError("langchain-openai is not installed. Install it or use ai_provider='deterministic'.")
 
     @retry(
         stop=stop_after_attempt(3),

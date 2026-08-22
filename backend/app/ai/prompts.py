@@ -1,5 +1,3 @@
-from langchain_core.prompts import ChatPromptTemplate
-
 EXTRACTION_PROMPT_TEMPLATE = """
 You are an expert industrial product data extractor.
 Your task is to extract product attributes from the given product information and retrieved evidence snippets.
@@ -21,4 +19,18 @@ Instructions:
 Return STRICT JSON adhering to the provided schema.
 """
 
-EXTRACTION_PROMPT = ChatPromptTemplate.from_template(EXTRACTION_PROMPT_TEMPLATE)
+
+class _LazyExtractionPrompt:
+    def format_messages(self, product_info: str, evidence_text: str):
+        try:
+            from langchain_core.prompts import ChatPromptTemplate
+            return ChatPromptTemplate.from_template(EXTRACTION_PROMPT_TEMPLATE).format_messages(
+                product_info=product_info,
+                evidence_text=evidence_text,
+            )
+        except ImportError:
+            return [{"role": "user", "content": EXTRACTION_PROMPT_TEMPLATE.format(product_info=product_info, evidence_text=evidence_text)}]
+
+
+EXTRACTION_PROMPT = _LazyExtractionPrompt()
+

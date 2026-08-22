@@ -11,6 +11,13 @@ from app.delivery.exporter import export_to_csv
 
 router = APIRouter()
 
+
+@router.get("", summary="Delivery Center Summary")
+@router.get("/", include_in_schema=False)
+def delivery_root(db: Session = Depends(get_db)):
+    return validate_delivery_endpoint(db)
+
+
 @router.get("/validate")
 def validate_delivery_endpoint(db: Session = Depends(get_db)):
     products = list_products(db)

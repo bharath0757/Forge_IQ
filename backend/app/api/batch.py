@@ -20,6 +20,27 @@ router = APIRouter()
 BATCH_JOBS: Dict[str, Dict[str, Any]] = {}
 
 
+@router.get("", summary="List Batch Jobs")
+@router.get("/", include_in_schema=False)
+def list_batch_jobs():
+    """List all registered batch processing jobs."""
+    return {
+        "status": "ok",
+        "active_jobs": len(BATCH_JOBS),
+        "jobs": [
+            {
+                "id": j["id"],
+                "status": j["status"],
+                "total": j["total"],
+                "processed": j["processed"],
+                "succeeded": j["succeeded"],
+                "failed": j["failed"],
+            }
+            for j in BATCH_JOBS.values()
+        ],
+    }
+
+
 @router.post("/upload")
 def upload_batch_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """

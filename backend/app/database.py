@@ -26,7 +26,21 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+_db_initialized = False
+
+
+def ensure_db_initialized():
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            init_db()
+            _db_initialized = True
+        except Exception:
+            pass
+
+
 def get_db():
+    ensure_db_initialized()
     db = SessionLocal()
     try:
         yield db

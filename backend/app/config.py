@@ -1,14 +1,14 @@
 import os
 from typing import List
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # Database — defaults to SQLite for zero-config local dev / Render free tier
+    # Database — defaults to SQLite for zero-config local dev / /tmp in serverless
     database_url: str = "sqlite:///./forgeiq.db"
 
     # CORS — in production, replace * with your actual frontend URL(s)
-    # e.g. "https://your-app.vercel.app,https://your-app.netlify.app"
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,*"
 
     # AI Providers: "deterministic" (offline), "openai", "anthropic", "nvidia"
@@ -22,6 +22,67 @@ class Settings(BaseSettings):
     # File Storage
     storage_dir: str = "uploads"
     max_file_size_mb: int = 50
+
+    @field_validator("max_file_size_mb", mode="before")
+    @classmethod
+    def parse_max_file_size(cls, v):
+        if v is None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            return 50
+        try:
+            return int(v)
+        except (ValueError, TypeError):
+            return 50
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def parse_database_url(cls, v):
+        is_serverless = bool(
+            os.environ.get("VERCEL") == "1"
+            or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+            or os.environ.get("VERCEL_ENV")
+        )
+        if v is None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            if is_serverless:
+                return "sqlite:////tmp/forgeiq.db"
+            return "sqlite:///./forgeiq.db"
+
+        val_str = str(v).strip()
+        if is_serverless and val_str.startswith("sqlite:///."):
+            return "sqlite:////tmp/forgeiq.db"
+
+        return val_str
+
+    @field_validator("storage_dir", mode="before")
+    @classmethod
+    def parse_storage_dir(cls, v):
+        is_serverless = bool(
+            os.environ.get("VERCEL") == "1"
+            or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+            or os.environ.get("VERCEL_ENV")
+        )
+        if v is None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            if is_serverless:
+                return "/tmp/uploads"
+            return "uploads"
+
+        val_str = str(v).strip()
+        if is_serverless and not val_str.startswith("/tmp"):
+            return "/tmp/uploads"
+        return val_str
+
+    @field_validator("ai_provider", mode="before")
+    @classmethod
+    def parse_ai_provider(cls, v):
+        if v is None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            return "deterministic"
+        return str(v).strip()
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if v is None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            return "http://localhost:3000,http://127.0.0.1:3000,*"
+        return str(v).strip()
 
     @property
     def cors_origins_list(self) -> List[str]:
@@ -48,3 +109,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
