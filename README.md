@@ -111,15 +111,15 @@ python backend/app/evaluation/quality_runner.py
 | Metric | Result | Notes |
 | :--- | :--- | :--- |
 | **Processed Products** | 1,000 / 1,000 (100%) | 0 pipeline failures |
-| **Manufacturer Resolution** | 959 / 1,000 (95.9%) | 41 remaining items lacked manufacturer in raw input (`-`) |
-| **Brand Resolution** | 796 / 1,000 (79.6%) | Canonical resolution across 90+ industrial brand masters |
+| **Manufacturer Resolution** | 959 / 1,000 (95.9%) | Heuristic resolution across 76 manufacturer aliases (official master pending) |
+| **Brand Resolution** | 796 / 1,000 (79.6%) | Heuristic resolution across 90+ industrial brand aliases (official master pending) |
 | **Identity Resolution** | 771 / 1,000 (77.1%) | MPN + Brand + Manufacturer composite resolution |
-| **Taxonomy Resolution** | 750 / 1,000 (75.0%) | 3-tier taxonomy (`Department > Class > Fine Class`) |
+| **Taxonomy Resolution** | 750 / 1,000 (75.0%) | Heuristic 3-tier taxonomy (`Department > Class > Fine Class`) |
 | **Description Validity** | 999 / 1,000 (99.9%) | 0 occurrences of placeholder text (`None`, `Unknown`, `Unclassified`) |
 | **Schema Compliance** | 252 / 252 (100%) | Exact column ordering and header match with UniHack Delivery Format |
 
-> **Notice Regarding Official Benchmarks:**
-> The competition 200-item ground truth workbook was unavailable in the workspace. Per strict anti-hallucination policies, official benchmark accuracy is explicitly reported as `UNAVAILABLE` rather than estimated or fabricated.
+> **Notice Regarding Official Reference Data & Benchmarks:**
+> Official UniHack/Unilog reference spreadsheets (the 200-item ground truth workbook, manufacturer/brand master, LOV master, UOM standard tables, and Decimal_Fraction reference) were unavailable in this environment. All normalization, UOM conversion, and taxonomy classification logic uses deterministic heuristics (`HEURISTIC`) or isolated demo fixtures (`DEMO`). Official benchmark accuracy is explicitly reported as **`UNAVAILABLE`**.
 
 ---
 

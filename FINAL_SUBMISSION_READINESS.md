@@ -107,19 +107,24 @@ The application is structured for a 3-minute hackathon judge demonstration:
 
 ## 8. Known Limitations & Reference Data Status
 
-1. **Official Ground-Truth Reference Workbook**:
+1. **Official Ground-Truth Reference Workbook (UNAVAILABLE)**:
    - The labeled 200-item Input-vs-Delivery reference file was not present in the workspace.
-   - Consequently, official benchmark accuracy and F1 metrics are reported as `UNAVAILABLE` rather than estimated or fabricated.
-2. **Missing Reference Catalogs**:
-   - Official LOV masters, UOM standard tables, and Decimal_Fraction references were not provided.
-   - ForgeIQ utilizes built-in deterministic normalization and entity resolution rules derived directly from industrial standards (ISO, IEC, ANSI).
+   - Consequently, official benchmark accuracy and F1 metrics are strictly reported as **`UNAVAILABLE`** rather than estimated or fabricated.
+
+2. **Official Master Catalogs & Reference Spreadsheets (UNAVAILABLE)**:
+   - Official reference files (`Unicat_Manufacturer_and_Brand_List.xlsx`, `Unicat_Lov_v1_0_Updated_With_Remarks.xlsx`, `Unilog_Master_UOM_Standards_Abbreviations_and_Terms.xlsx`, `Decimal_Fraction.xlsx`, `FAUCETS_LOV.xlsx`, `Fittings_LOV.xlsx`) were not provided in this environment.
+   - **Entity Resolution**: Derived via **heuristic normalization aliases** (`HEURISTIC`) based on input dataset patterns, not official UniHack/Unilog masters.
+   - **UOM & Fraction Standardization**: Handled by **deterministic engineering heuristics** (`HEURISTIC`), not official LOV/UOM master tables.
+   - **Taxonomy Engine**: Rule-based keyword matching (`HEURISTIC`) across standard industrial categories.
+   - **Demo Seeds**: 5 synthetic demo products (`DEMO`) used solely for interactive reviewer walkthroughs, isolated from production ingestion.
+
 3. **External LLM API Fallback**:
-   - The platform is pre-configured with robust deterministic regex and rule extractors to operate entirely offline without requiring external API keys.
+   - The platform is equipped with robust deterministic regex and rule extractors to operate entirely offline without requiring external API keys.
 
 ---
 
 ## 9. Final Recommendation: SUBMISSION READY
 
-All code, tests, schemas, delivery outputs, and UI flows meet the submission criteria. No further speculative architectural changes or modifications are required.
+All code, tests, schemas, delivery outputs, and UI flows meet the submission criteria. All reference data provenance is accurately and transparently documented.
 
 **System Status**: `SUBMISSION READY` ✅

@@ -1,6 +1,7 @@
 """
-Canonical manufacturer and brand master data derived from Unihack dataset patterns.
-Used for entity resolution when official reference spreadsheets are unavailable.
+Heuristic manufacturer and brand alias mappings derived from input dataset observation.
+NOTE: These are deterministic heuristic rules (HEURISTIC) and NOT official UniHack/Unilog reference data.
+Official reference spreadsheets (Unicat_Manufacturer_and_Brand_List.xlsx) are UNAVAILABLE.
 """
 
 from typing import Dict, Tuple

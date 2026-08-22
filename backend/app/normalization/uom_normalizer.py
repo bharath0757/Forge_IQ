@@ -2,9 +2,9 @@ import re
 
 class UOMNormalizer:
     """
-    Standardizes units of measure formats.
-    Rule: VALUE + SPACE + APPROVED UNIT
-    e.g., 24in -> 24 in
+    Standardizes units of measure formats using engineering heuristics (HEURISTIC).
+    Rule: VALUE + SPACE + STANDARD UNIT (e.g. 24in -> 24 in)
+    Note: Official UniHack/Unilog Master UOM Standards table is UNAVAILABLE.
     """
     
     STANDARD_UNITS = {
